@@ -1,10 +1,10 @@
-# OOPFinal - Console Adventure Game
+﻿# OOPFinal - Console Adventure Game
 
 [**Demo Video in Repo**](#)
 
 ---
 
-## ?? Game Overview
+## 🎮 Game Overview
 
 In this game, you create a character with a name of your choosing and then wander down a path to fight monsters. Defeat all monsters to win the game!
 
@@ -12,7 +12,7 @@ You are given four options each turn until the game ends. Select an option by ty
 
 ---
 
-## ??? Main Menu Options
+## 🕹️ Main Menu Options
 
 1. **Continue On**  
    - Continue down the path with a chance to:
@@ -36,6 +36,6 @@ You are given four options each turn until the game ends. Select an option by ty
 
 ---
 
-## ?? Monster Encounters
+## 👾 Monster Encounters
 
 If you come across a monster, you are given four options. The battle continues until you kill the monster, it kills you, or you
