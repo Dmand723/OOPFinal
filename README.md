@@ -39,3 +39,25 @@ You are given four options each turn until the game ends. Select an option by ty
 ## 👾 Monster Encounters
 
 If you come across a monster, you are given four options. The battle continues until you kill the monster, it kills you, or you
+
+---
+
+## 🗡️ Battle Options
+
+When you encounter a monster, you have the following options:
+
+- **Attack**  
+  Attacking the monster will deal your base damage plus the damage of a randomly selected weapon, with a chance to crit for extra damage!
+
+- **Block**  
+  Blocking gives you the chance to block an enemy's damage if it was going to attack you.
+
+- **Heal**  
+  Works the same way as healing in the main menu options.
+
+- **Run Away**  
+  Running away gives you the chance to keep wandering, with the possibility of finding a healing potion or a different monster to fight. However, you will still have to fight the escaped monster later if you want to win.
+
+---
+
+**Have Fun!**
