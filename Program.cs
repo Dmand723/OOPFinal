@@ -349,6 +349,171 @@ namespace OOPFinal
             Globals.WriteRainbow("You defeted all enemys you win!!!!");
             isRunning = false;
         }
+        #region Game Logic
+        void continueOn()//The first option to continue down the path with a random chance to find a monster,
+                         //come accross a health potion, or continue down the path with noting happening
+        {
+            if (enemyList.Length > 0)
+            {
+                int randint = RandomNumberGenerator.GetInt32(6);
+                if (randint >= 0 && randint <= 2)
+                {
+                    int rantMonstInt = RandomNumberGenerator.GetInt32(enemyList.Length);
+                    curEnemy = enemyList[rantMonstInt];
+                    Globals.WriteColoredLine($"You've come accross a mosnster!!\n" +
+                        $"monster type:{curEnemy.getName()} \nMosnter Current Health:{curEnemy.getCurHp()}", Globals.colorKey["bad"]);
+                    Globals.WriteColoredLine($"Players Current Helth:{player.getCurHp()}", Globals.colorKey["stats"]);
+                    pickBattleOption();
+                }
+                else if (randint == 3)
+                {
+                    player.addHealthPotion();
+                    Globals.WriteColoredLine($"You came accross a health potion!!!\n" +
+                        $"New potion ammount {player.getHealthPotionAmmount()}", Globals.colorKey["good"]);
+                }
+                else
+                {
+                    Globals.WriteColoredLine("You come accross noting and move on", Globals.colorKey["neutral"]);
+                }
+            }
+        }
+
+        void pickBattleOption()//Another menu that asks the player to choose a number 1-4
+                               //on what to do when encontering a monster and calls the corrisponding methods.
+        {
+            Globals.WriteColoredLine("What Will You Do??\n" +
+                "1:Attack\n" +
+                "2:Block\n" +
+                "3:Heal\n" +
+                "4:Run Away", Globals.colorKey["battleMenu"]);
+            if (int.TryParse(Console.ReadLine(), out int selectedOption))
+            {
+                if (selectedOption > 0 && selectedOption <= 4)
+                {
+                    bool willAttack;
+                    int willAttackInt = RandomNumberGenerator.GetInt32(13);
+                    willAttack = willAttackInt >= 3;
+                    switch (selectedOption)
+                    {
+                        case 1:
+                            attack(willAttack);
+                            break;
+                        case 2:
+                            block(willAttack);
+                            break;
+                        case 3:
+                            player.Heal();
+                            pickBattleOption();
+                            break;
+                        case 4:
+                            Globals.WriteColoredLine($"You ran away from the mosnster you might see it again...\n" +
+                                $"Monsters health left: {curEnemy.getCurHp()}\n" +
+                                $"Player Health left: {player.getCurHp()}", Globals.colorKey["stats"]);
+                            break;
+                    }
+                }
+            }
+            else
+            {
+                Globals.WriteColoredLine("Please Select a Valid Option (1-4)", Globals.colorKey["error"]);
+                pickBattleOption();
+            }
+        }
+
+        void attack(bool willAttack)//Chooses a random wepon and a random chance to crit attack
+                                    //and calulates damage bassed on that
+        {
+            Console.Clear();
+            int attackDmg;
+            int randWeponInt = RandomNumberGenerator.GetInt32(3);
+            Wepon randWepon = wepons[randWeponInt];
+            bool isCrit = player.checkForCrit(randWepon.getCritChance());
+            if (isCrit)
+            {
+                attackDmg = player.baseAttackPower + randWepon.getAttackBonus() + 2;
+            }
+            else
+            {
+                attackDmg = player.baseAttackPower + randWepon.getAttackBonus();
+            }
+            player.Attack(curEnemy, attackDmg);
+            if (isCrit)
+            {
+                Globals.WriteColoredLine($"You got a crit!!\n" +
+                    $"You attacked with {randWepon.getName()}\n" +
+                    $"You delt {attackDmg} Damage\n" +
+                    $"Enemys Remaining Health:{curEnemy.getCurHp()}HP", Globals.colorKey["good"]);
+            }
+            else
+            {
+                Globals.WriteColoredLine($"You didn't crit :(\n" +
+                    $"You attacked with {randWepon.getName()}\n" +
+                    $"You delt {attackDmg} Damage\n" +
+                    $"Enemys Remaining Health:{curEnemy.getCurHp()}HP", Globals.colorKey["neutral"]);
+            }
+
+            if (curEnemy.getCurHp() <= 0)
+            {
+                Globals.WriteColoredLine($"You defeted the {curEnemy.getName()}!!", Globals.colorKey["good"]);
+                RemoveEnemy(curEnemy);
+                if (enemyList.Length <= 0)
+                {
+                    gameWin();
+                }
+            }
+            else
+            {
+                if (willAttack)
+                {
+                    curEnemy.Attack(player, curEnemy.getAttackPower());
+                    Globals.WriteColoredLine($"The Enemy attacked you!!\n" +
+                        $"It delt {curEnemy.getAttackPower()} Damage\n" +
+                        $"Player current health {player.getCurHp()} HP", Globals.colorKey["bad"]);
+                    if (player.getCurHp() <= 0)
+                    {
+                        Globals.WriteColoredLine("You have died game over:(", Globals.colorKey["bad"]);
+                        isRunning = false;
+                    }
+                    else pickBattleOption();
+                }
+                else
+                {
+                    pickBattleOption();
+                }
+            }
+        }
+
+        void block(bool willAttack)//Blocks enemy's attack if attacks 
+        {
+            if (willAttack)
+            {
+                Globals.WriteColoredLine($"Good job you blocked an attack of {curEnemy.getAttackPower()} HP!!!", Globals.colorKey["good"]);
+            }
+            else
+            {
+                Globals.WriteColoredLine("The enemy didn't attack", Globals.colorKey["neutral"]);
+            }
+            pickBattleOption();
+        }
+
+        void RemoveEnemy(Enemy enemyToRemove)//Called after an enemy dies to remove it from the enemys list 
+        {
+            int indexToRemove = Array.IndexOf(enemyList, enemyToRemove);
+            if (indexToRemove >= 0)
+            {
+                enemyList[indexToRemove] = null;
+                Enemy[] newEnemyList = enemyList.Where(e => e != null).ToArray();
+                enemyList = newEnemyList;
+            }
+        }
+
+        void gameWin()//Called afeter all enemys has been defeted telling the player they have won
+                      //and ends the game loop
+        {
+            Globals.WriteRainbow("You defeted all enemys you win!!!!");
+            isRunning = false;
+        }
+        #endregion
         #endregion
     }
 }
